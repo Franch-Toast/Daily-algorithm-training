@@ -63,3 +63,67 @@ int main()
     cout << n; // 到最后也没有超过预算
     return 0;
 }
+
+/*
+    2.小盖切字符串
+
+    小盖定义一个字符串的权值是:字符串辅音数量和元音数量的差的绝对值。
+    例如，“arcaea"的权值是 2，因为有4个元音，2 个辅音权值为 4-2 =2。
+    现在小盖拿到了一个字符串，她想把这个字符串切成两个非空字符串，需要满足两个字符串的权值相等。
+    小盖想知道，有多少种不同的切割方式?
+    我们定义，元音有"aeiou"这五种，其余字母均为辅音
+
+输入描述：
+    一个仅包含小写字母的字符串，长度不超过200000
+
+输出描述：
+    切割方案数
+
+例子：
+    arcaea
+输出
+    2
+*/
+
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+bool isVowel(char c)
+{
+    return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u';
+}
+
+int main()
+{
+    string str;
+    cin >> str;
+
+    int n = str.length();
+    int pres[n + 1] = {0};
+
+    for (int i = 1; i <= n; i++)
+    {
+        pres[i] += pres[i - 1];
+        if (isVowel(str[i - 1]))
+        {
+            pres[i]++;
+        }
+    }
+
+    int ans = 0;
+    for (int i = 0; i < n - 1; i++)
+    {
+        int left = abs(pres[i + 1] - (i + 1 - pres[i + 1]));
+        int right = abs(pres[n] - pres[i + 1] - (n - 1 - i - pres[n] + pres[i + 1]));
+        if (left == right)
+        {
+            ans++;
+        }
+    }
+
+    cout << ans << endl;
+    return 0;
+}
+
