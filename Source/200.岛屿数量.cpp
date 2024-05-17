@@ -6,54 +6,78 @@
 
 // @lc code=start
 #include "vector"
+#include "queue"
 
 using namespace std;
 class Solution
 {
-public:
-    /* 遍历所有的陆地，在遍历的过程中对已遍历过的陆地进行标记，防止多次遍历 */
-    void dfs(vector<vector<char>> &grid, int i, int j) // 由于不需要计算陆地的大小，所以直接在引用中更改标记即可，不需要返回值
+private:
+    queue<pair<int, int>> q;
+    int dir[4][2] = {0, 1, 1, 0, -1, 0, 0, -1}; // 四个方向
+    void dfs(vector<vector<char>> &grid, vector<vector<bool>> &visited, int x, int y)
     {
-        if (!judgement(grid, i, j)) // 如果越界了直接返回
-            return;
-        if (grid[i][j] == '1') 
+        for (int i = 0; i < 4; i++)
         {
-            grid[i][j] = 2; // 更改标记
-            /* 向四个方向延申 */
-            dfs(grid, i - 1, j);
-            dfs(grid, i + 1, j);
-            dfs(grid, i, j - 1);
-            dfs(grid, i, j + 1);
+            int nextx = x + dir[i][0];
+            int nexty = y + dir[i][1];
+            if (nextx < 0 || nextx >= grid.size() || nexty < 0 || nexty >= grid[0].size())
+                continue; // 越界了，直接跳过
+            if (!visited[nextx][nexty] && grid[nextx][nexty] == '1')
+            { // 没有访问过的 同时 是陆地的
+
+                visited[nextx][nexty] = true;
+                dfs(grid, visited, nextx, nexty);
+            }
         }
     }
-    bool judgement(vector<vector<char>> &grid, int i, int j) // 判断是否越界
+
+    void bfs(vector<vector<char>> &grid, vector<vector<bool>> &visited)
     {
-        int n = grid.size();
-        int m = grid[0].size();
-        if (i >= n || j >= m)
-            return false;
-        else if (i < 0 || j < 0)
-            return false;
-        else
-            return true;
+        while (!q.empty())
+        {
+            // int n = q.size();
+            int nextx = q.front().first;
+            int nexty = q.front().second;
+            q.pop();
+            
+            for (int i = 0; i < 4; i++)
+            {
+                int x = nextx + dir[i][0];
+                int y = nexty + dir[i][1];
+
+                if (x < 0 || x >= grid.size() || y < 0 || y >= grid[0].size() || visited[x][y] || grid[x][y] == '0')
+                {
+                    continue;
+                }
+                    
+                q.push({x, y});
+                visited[x][y] = 1;
+            }
+        }
     }
+
+public:
     int numIslands(vector<vector<char>> &grid)
     {
-        int ans = 0;
-        int n = grid.size();
-        int m = grid[0].size();
-        for (int i = 0; i < n; ++i)
+        int n = grid.size(), m = grid[0].size();
+        vector<vector<bool>> visited = vector<vector<bool>>(n, vector<bool>(m, false));
+
+        int result = 0;
+        for (int i = 0; i < n; i++)
         {
-            for (int j = 0; j < m; ++j)
+            for (int j = 0; j < m; j++)
             {
-                if (grid[i][j] == '1') // 如果发现了还没有被遍历的陆地
+                if (!visited[i][j] && grid[i][j] == '1')
                 {
-                    ans++;           // 陆地数量+1
-                    dfs(grid, i, j); // 进入递归
+                    visited[i][j] = true;
+                    result++;           // 遇到没访问过的陆地，+1
+                    q.push({i, j});     // BFS时使用，入队列
+                    bfs(grid, visited); // BFS
+                    // dfs(grid, visited, i, j); // 将与其链接的陆地都标记上 true
                 }
             }
         }
-        return ans;
+        return result;
     }
 };
 // @lc code=end
