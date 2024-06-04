@@ -14,18 +14,19 @@ class Solution
 public:
     void rotate(vector<vector<int>> &matrix)
     {
-        int row = matrix.size();
+        int m = matrix.size();
+        int n = matrix[0].size();
 
-        int temp;
-        for (int i = 0; i < (row) / 2; i++)
+        for (int i = 0; i < m / 2; i++)
         {
-            for (int j = 0; j < (row + 1) / 2; j++)
+            for (int j = 0; j < (n + 1) / 2; j++)
             {
-                temp = matrix[i][j];
-                matrix[i][j] = matrix[row - 1 - j][i];
-                matrix[row - 1 - j][i] = matrix[row - 1 - i][row - 1 - j];
-                matrix[row - 1 - i][row - 1 - j] = matrix[j][row - 1 - i];
-                matrix[j][row - 1 - i] = temp;
+                int temp = matrix[i][j];
+
+                matrix[i][j] = matrix[m - j - 1][i];
+                matrix[m - j - 1][i] = matrix[m - i - 1][n - j - 1];
+                matrix[m - i - 1][n - j - 1] = matrix[j][n - i - 1];
+                matrix[j][n - i - 1] = temp;
             }
         }
     }
